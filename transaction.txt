@@ -1,0 +1,63 @@
+{
+  "name": "Transaction",
+  "type": "object",
+  "properties": {
+    "gadget_id": {
+      "type": "string",
+      "description": "ID of the gadget"
+    },
+    "gadget_title": {
+      "type": "string"
+    },
+    "buyer_email": {
+      "type": "string"
+    },
+    "buyer_name": {
+      "type": "string"
+    },
+    "seller_email": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "number",
+      "description": "Total transaction amount"
+    },
+    "platform_fee": {
+      "type": "number",
+      "description": "Platform commission (5% of amount)"
+    },
+    "seller_payout": {
+      "type": "number",
+      "description": "Amount paid to seller after fees"
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "paypal",
+        "ecocash"
+      ],
+      "description": "Payment method used"
+    },
+    "payment_reference": {
+      "type": "string",
+      "description": "Transaction reference from payment provider"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "completed",
+        "failed",
+        "refunded"
+      ],
+      "default": "pending"
+    }
+  },
+  "required": [
+    "gadget_id",
+    "buyer_email",
+    "seller_email",
+    "amount",
+    "payment_method"
+  ]
+}

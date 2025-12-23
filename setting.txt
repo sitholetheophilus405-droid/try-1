@@ -1,0 +1,251 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2, ArrowLeft, CheckCircle2, Camera, CreditCard, Smartphone } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast } from 'sonner';
+
+export default function Settings() {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    phone: '',
+    location: '',
+    bio: '',
+    paypal_email: '',
+    ecocash_number: ''
+  });
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const isAuth = await base44.auth.isAuthenticated();
+      if (!isAuth) {
+        base44.auth.redirectToLogin(window.location.href);
+        return;
+      }
+      const userData = await base44.auth.me();
+      setUser(userData);
+      setFormData({
+        phone: userData.phone || '',
+        location: userData.location || '',
+        bio: userData.bio || '',
+        paypal_email: userData.paypal_email || '',
+        ecocash_number: userData.ecocash_number || ''
+      });
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
+
+  const handleAvatarUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setAvatarUploading(true);
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    await base44.auth.updateMe({ avatar_url: file_url });
+    setUser(prev => ({ ...prev, avatar_url: file_url }));
+    setAvatarUploading(false);
+    toast.success('Profile photo updated');
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    await base44.auth.updateMe(formData);
+    setUser(prev => ({ ...prev, ...formData }));
+    setSaving(false);
+    toast.success('Settings saved successfully');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-violet-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50 py-8">
+      <div className="max-w-2xl mx-auto px-4">
+        <Link to={createPageUrl('Profile')} className="inline-flex items-center text-sm text-slate-500 hover:text-violet-600 mb-6">
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to profile
+        </Link>
+
+        <h1 className="text-2xl font-bold text-slate-900 mb-8">Account Settings</h1>
+
+        {/* Profile Photo */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Profile Photo</CardTitle>
+            <CardDescription>Your photo will be visible on your listings and profile</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center gap-6">
+              <div className="relative">
+                <Avatar className="w-24 h-24">
+                  <AvatarImage src={user?.avatar_url} />
+                  <AvatarFallback className="bg-violet-100 text-violet-600 text-2xl">
+                    {user?.full_name?.[0]?.toUpperCase() || 'U'}
+                  </AvatarFallback>
+                </Avatar>
+                {avatarUploading && (
+                  <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                    disabled={avatarUploading}
+                  />
+                  <Button variant="outline" asChild>
+                    <span>
+                      <Camera className="w-4 h-4 mr-2" />
+                      Change Photo
+                    </span>
+                  </Button>
+                </label>
+                <p className="text-xs text-slate-500 mt-2">JPG, PNG or GIF. Max 5MB.</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Profile Info */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Profile Information</CardTitle>
+            <CardDescription>Update your public profile details</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label>Full Name</Label>
+              <Input
+                value={user?.full_name || ''}
+                disabled
+                className="mt-2 bg-slate-50"
+              />
+              <p className="text-xs text-slate-500 mt-1">Contact support to change your name</p>
+            </div>
+            
+            <div>
+              <Label>Email</Label>
+              <Input
+                value={user?.email || ''}
+                disabled
+                className="mt-2 bg-slate-50"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                placeholder="+1 234 567 890"
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                placeholder="City, Country"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                className="mt-2"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="bio">Bio</Label>
+              <Textarea
+                id="bio"
+                placeholder="Tell buyers a bit about yourself..."
+                value={formData.bio}
+                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                className="mt-2"
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Payment Settings */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Payment Settings</CardTitle>
+            <CardDescription>Configure how you receive payments from buyers</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="paypal" className="flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-blue-600" />
+                PayPal Email
+              </Label>
+              <Input
+                id="paypal"
+                type="email"
+                placeholder="your@email.com"
+                value={formData.paypal_email}
+                onChange={(e) => setFormData({ ...formData, paypal_email: e.target.value })}
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">Buyers can send payments to this email</p>
+            </div>
+
+            <Separator />
+
+            <div>
+              <Label htmlFor="ecocash" className="flex items-center gap-2">
+                <Smartphone className="w-4 h-4 text-green-600" />
+                EcoCash Number
+              </Label>
+              <Input
+                id="ecocash"
+                placeholder="07XX XXX XXX"
+                value={formData.ecocash_number}
+                onChange={(e) => setFormData({ ...formData, ecocash_number: e.target.value })}
+                className="mt-2"
+              />
+              <p className="text-xs text-slate-500 mt-1">Your EcoCash number for mobile payments</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="w-full h-14 bg-violet-600 hover:bg-violet-700 rounded-xl font-semibold"
+        >
+          {saving ? (
+            <>
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            'Save Changes'
+          )}
+        </Button>
+      </div>
+    </div>

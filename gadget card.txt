@@ -1,0 +1,89 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { MapPin, Eye, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const conditionLabels = {
+  new: { label: 'New', class: 'bg-emerald-500' },
+  like_new: { label: 'Like New', class: 'bg-green-500' },
+  good: { label: 'Good', class: 'bg-blue-500' },
+  fair: { label: 'Fair', class: 'bg-yellow-500' },
+  poor: { label: 'Poor', class: 'bg-orange-500' }
+};
+
+export default function GadgetCard({ gadget, index = 0 }) {
+  const condition = conditionLabels[gadget.condition] || conditionLabels.good;
+  
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.05, duration: 0.3 }}
+    >
+      <Link to={createPageUrl(`GadgetDetail?id=${gadget.id}`)}>
+        <Card className="group overflow-hidden bg-white border-0 shadow-sm hover:shadow-xl transition-all duration-500 rounded-2xl">
+          <div className="relative aspect-square overflow-hidden bg-slate-100">
+            {gadget.images?.[0] ? (
+              <img 
+                src={gadget.images[0]} 
+                alt={gadget.title}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+                <span className="text-slate-400 text-sm">No image</span>
+              </div>
+            )}
+            
+            <div className="absolute top-3 left-3 flex flex-col gap-2">
+              <Badge className={`${condition.class} text-white font-medium px-2.5 py-1 text-xs shadow-lg`}>
+                {condition.label}
+              </Badge>
+              {gadget.is_featured && (
+                <Badge className="bg-amber-500 text-white font-medium px-2.5 py-1 text-xs shadow-lg flex items-center gap-1">
+                  <Star className="w-3 h-3 fill-white" />
+                  Featured
+                </Badge>
+              )}
+            </div>
+            
+            {gadget.status === 'sold' && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span className="text-white font-bold text-xl tracking-wider">SOLD</span>
+              </div>
+            )}
+            
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex items-center gap-1 text-white/90 text-xs">
+                <Eye className="w-3.5 h-3.5" />
+                <span>{gadget.views || 0} views</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-4">
+            <p className="text-xs text-slate-400 uppercase tracking-wider mb-1">{gadget.category}</p>
+            <h3 className="font-semibold text-slate-900 truncate group-hover:text-violet-600 transition-colors">
+              {gadget.title}
+            </h3>
+            
+            <div className="mt-3 flex items-end justify-between">
+              <p className="text-xl font-bold text-slate-900">
+                ${gadget.price?.toLocaleString()}
+              </p>
+              {gadget.location && (
+                <div className="flex items-center gap-1 text-slate-400 text-xs">
+                  <MapPin className="w-3 h-3" />
+                  <span className="truncate max-w-[80px]">{gadget.location}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      </Link>
+    </motion.div>
+  );
+}

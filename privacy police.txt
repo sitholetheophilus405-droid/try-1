@@ -1,0 +1,81 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { ArrowLeft } from 'lucide-react';
+
+export default function PrivacyPolicy() {
+  return (
+    <div className="min-h-screen bg-slate-50 py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <Link to={createPageUrl('Home')} className="inline-flex items-center text-sm text-slate-500 hover:text-violet-600 mb-6">
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to home
+        </Link>
+
+        <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Privacy Policy</h1>
+          <p className="text-slate-500 mb-8">Last updated: December 23, 2025</p>
+
+          <div className="prose prose-slate max-w-none">
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">1. Information We Collect</h2>
+            <p className="text-slate-600 mb-4">
+              We collect information you provide directly to us when you create an account, list items for sale, 
+              make purchases, or communicate with us. This includes your name, email address, phone number, 
+              location, and payment information.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">2. How We Use Your Information</h2>
+            <p className="text-slate-600 mb-4">
+              We use the information we collect to:
+            </p>
+            <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
+              <li>Provide, maintain, and improve our services</li>
+              <li>Process transactions and send related information</li>
+              <li>Send you technical notices and support messages</li>
+              <li>Respond to your comments and questions</li>
+              <li>Protect against fraudulent or illegal activity</li>
+            </ul>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">3. Information Sharing</h2>
+            <p className="text-slate-600 mb-4">
+              We share your information only with your consent or as necessary to complete transactions you 
+              initiate. When you make a purchase, we share your contact information with the seller to facilitate 
+              the transaction.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">4. Data Security</h2>
+            <p className="text-slate-600 mb-4">
+              We implement appropriate security measures to protect your personal information. However, no 
+              method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">5. Your Rights</h2>
+            <p className="text-slate-600 mb-4">
+              You have the right to access, update, or delete your personal information at any time through 
+              your account settings. You may also contact us to exercise these rights.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">6. Cookies</h2>
+            <p className="text-slate-600 mb-4">
+              We use cookies and similar tracking technologies to improve your experience on our platform. 
+              You can control cookies through your browser settings.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">7. Contact Us</h2>
+            <p className="text-slate-600 mb-4">
+              If you have questions about this Privacy Policy, please contact us at privacy@gadgetx.com
+            </p>
+
+            <div className="bg-slate-50 rounded-xl p-6 mt-8">
+              <p className="text-sm text-slate-600">
+                <strong>GadgetX</strong> is owned and operated by <strong>Theophilus T Sithole</strong>, 
+                co-founded with <strong>Amos B Nyamaropa</strong>. 
+                © {new Date().getFullYear()} GadgetX. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

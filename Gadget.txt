@@ -1,0 +1,97 @@
+{
+  "name": "Gadget",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Name of the gadget"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the gadget"
+    },
+    "price": {
+      "type": "number",
+      "description": "Price in USD"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "phones",
+        "laptops",
+        "tablets",
+        "accessories",
+        "cameras",
+        "gaming",
+        "audio",
+        "wearables",
+        "other"
+      ],
+      "description": "Category of the gadget"
+    },
+    "condition": {
+      "type": "string",
+      "enum": [
+        "new",
+        "like_new",
+        "good",
+        "fair",
+        "poor"
+      ],
+      "description": "Condition of the gadget"
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Array of image URLs"
+    },
+    "seller_email": {
+      "type": "string",
+      "description": "Email of the seller"
+    },
+    "seller_name": {
+      "type": "string",
+      "description": "Name of the seller"
+    },
+    "seller_phone": {
+      "type": "string",
+      "description": "Contact phone number"
+    },
+    "location": {
+      "type": "string",
+      "description": "Seller location"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "available",
+        "sold",
+        "reserved"
+      ],
+      "default": "available"
+    },
+    "views": {
+      "type": "number",
+      "default": 0
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Featured listing (paid promotion)"
+    },
+    "featured_until": {
+      "type": "string",
+      "format": "date",
+      "description": "Featured listing expiration"
+    }
+  },
+  "required": [
+    "title",
+    "price",
+    "category",
+    "condition",
+    "seller_email"
+  ]
+}

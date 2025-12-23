@@ -1,0 +1,188 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowLeft, Zap, Users, Shield, TrendingUp, Heart, Award } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+export default function About() {
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Hero */}
+      <div className="bg-gradient-to-br from-violet-600 to-purple-700 py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <Zap className="w-10 h-10 text-white" />
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+              About GadgetX
+            </h1>
+            <p className="text-xl text-violet-100 max-w-2xl mx-auto">
+              Building the most trusted marketplace for buying and selling electronics
+            </p>
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        <Link to={createPageUrl('Home')} className="inline-flex items-center text-sm text-slate-500 hover:text-violet-600 mb-8">
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to home
+        </Link>
+
+        {/* Story */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-2xl shadow-sm p-8 md:p-12 mb-8"
+        >
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Our Story</h2>
+          <p className="text-slate-600 mb-4">
+            GadgetX was founded with a simple mission: to create a safe, transparent, and efficient 
+            marketplace where people can buy and sell electronics with confidence. We believe everyone 
+            should have access to quality technology at fair prices.
+          </p>
+          <p className="text-slate-600">
+            What started as a small platform has grown into a thriving community of tech enthusiasts, 
+            sellers, and buyers who trust GadgetX for their electronic trading needs.
+          </p>
+        </motion.div>
+
+        {/* Founders */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl shadow-sm p-8 md:p-12 mb-8"
+        >
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">The Founders</h2>
+          
+          <div className="grid md:grid-cols-2 gap-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <Award className="w-8 h-8 text-violet-600" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
+                  Theophilus T Sithole
+                </h3>
+                <p className="text-violet-600 font-semibold text-center mb-3">Owner & Founder</p>
+                <p className="text-slate-600 text-sm text-center">
+                  Visionary leader and owner of GadgetX, driving innovation in the electronic marketplace 
+                  space with a passion for connecting buyers and sellers seamlessly.
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardContent className="p-6">
+                <div className="w-16 h-16 bg-violet-100 rounded-full flex items-center justify-center mb-4 mx-auto">
+                  <Users className="w-8 h-8 text-violet-600" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 text-center mb-2">
+                  Amos B Nyamaropa
+                </h3>
+                <p className="text-violet-600 font-semibold text-center mb-3">Co-Founder</p>
+                <p className="text-slate-600 text-sm text-center">
+                  Strategic co-founder dedicated to building a trustworthy platform that empowers users 
+                  to trade electronics with confidence and security.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </motion.div>
+
+        {/* Values */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-white rounded-2xl shadow-sm p-8 md:p-12 mb-8"
+        >
+          <h2 className="text-2xl font-bold text-slate-900 mb-6">Our Values</h2>
+          
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="text-center">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Shield className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Trust & Safety</h3>
+              <p className="text-sm text-slate-600">
+                Secure payments and verified sellers for your peace of mind
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <TrendingUp className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Fair Pricing</h3>
+              <p className="text-sm text-slate-600">
+                Competitive rates and transparent fees for all users
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Heart className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-2">Community First</h3>
+              <p className="text-sm text-slate-600">
+                Building a supportive community of tech enthusiasts
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Acknowledgements */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-gradient-to-br from-violet-50 to-purple-50 rounded-2xl p-8 md:p-12 mb-8"
+        >
+          <h2 className="text-2xl font-bold text-slate-900 mb-4">Acknowledgements</h2>
+          <p className="text-slate-600 mb-4">
+            We extend our heartfelt gratitude to <strong>Amos B Nyamaropa</strong> and{' '}
+            <strong>Theophilus T Sithole</strong> for their unwavering dedication, vision, and leadership 
+            in bringing GadgetX to life.
+          </p>
+          <p className="text-slate-600">
+            Their commitment to creating a transparent, secure, and user-friendly marketplace has made 
+            GadgetX a trusted platform for thousands of users worldwide. Thank you for believing in our 
+            mission and making this dream a reality.
+          </p>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="text-center"
+        >
+          <Link to={createPageUrl('Home')}>
+            <Button className="bg-violet-600 hover:bg-violet-700 h-14 px-8 rounded-xl text-lg">
+              Start Trading on GadgetX
+            </Button>
+          </Link>
+        </motion.div>
+
+        {/* Copyright */}
+        <div className="text-center mt-12 pt-8 border-t">
+          <p className="text-sm text-slate-500">
+            © {new Date().getFullYear()} GadgetX. All rights reserved.
+          </p>
+          <p className="text-sm text-slate-500 mt-1">
+            Owned by <strong>Theophilus T Sithole</strong> | Co-founded with <strong>Amos B Nyamaropa</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,244 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Check, Zap, Crown, Rocket, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const plans = [
+  {
+    name: 'Free',
+    tier: 'free',
+    price: 0,
+    icon: Zap,
+    color: 'text-slate-600',
+    bgColor: 'bg-slate-100',
+    features: [
+      'Up to 5 active listings',
+      'Standard listing visibility',
+      '5% platform fee per sale',
+      'Basic seller profile',
+      'Email support'
+    ]
+  },
+  {
+    name: 'Premium',
+    tier: 'premium',
+    price: 9.99,
+    icon: Crown,
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-100',
+    popular: true,
+    features: [
+      'Up to 25 active listings',
+      'Priority listing visibility',
+      '3% platform fee per sale',
+      'Verified badge on profile',
+      'Featured listing (1/month)',
+      'Priority support'
+    ]
+  },
+  {
+    name: 'Pro',
+    tier: 'pro',
+    price: 29.99,
+    icon: Rocket,
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-100',
+    features: [
+      'Unlimited active listings',
+      'Top priority visibility',
+      '2% platform fee per sale',
+      'Verified pro badge',
+      'Featured listings (5/month)',
+      'Analytics dashboard',
+      '24/7 priority support',
+      'Early access to features'
+    ]
+  }
+];
+
+export default function Pricing() {
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const auth = await base44.auth.isAuthenticated();
+      setIsAuthenticated(auth);
+      if (auth) {
+        const userData = await base44.auth.me();
+        setUser(userData);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleUpgrade = (tier) => {
+    if (!isAuthenticated) {
+      base44.auth.redirectToLogin(window.location.href);
+      return;
+    }
+    // In a real app, this would integrate with Stripe or payment processor
+    alert(`Upgrade to ${tier} - Payment integration would go here`);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-violet-50/30 py-16">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16"
+        >
+          <Badge className="mb-4 bg-violet-100 text-violet-700 border-violet-200">
+            Pricing Plans
+          </Badge>
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            Choose Your Plan
+          </h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Start free and upgrade as you grow. Lower fees, more visibility, and premium features.
+          </p>
+        </motion.div>
+
+        {/* Pricing Cards */}
+        <div className="grid md:grid-cols-3 gap-8 mb-16">
+          {plans.map((plan, index) => {
+            const Icon = plan.icon;
+            const isCurrent = user?.membership_tier === plan.tier;
+            
+            return (
+              <motion.div
+                key={plan.tier}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card className={`relative overflow-hidden ${plan.popular ? 'border-2 border-violet-500 shadow-xl' : 'border-slate-200'}`}>
+                  {plan.popular && (
+                    <div className="absolute top-0 right-0 bg-violet-500 text-white text-xs font-semibold px-3 py-1 rounded-bl-lg">
+                      Most Popular
+                    </div>
+                  )}
+                  
+                  <CardHeader className="text-center pb-8">
+                    <div className={`w-14 h-14 ${plan.bgColor} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                      <Icon className={`w-7 h-7 ${plan.color}`} />
+                    </div>
+                    <CardTitle className="text-2xl mb-2">{plan.name}</CardTitle>
+                    <div className="mb-2">
+                      <span className="text-4xl font-bold text-slate-900">${plan.price}</span>
+                      <span className="text-slate-500">/month</span>
+                    </div>
+                    {isCurrent && (
+                      <Badge className="bg-green-100 text-green-700 border-green-200">
+                        Current Plan
+                      </Badge>
+                    )}
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <ul className="space-y-3 mb-8">
+                      {plan.features.map((feature, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span className="text-slate-600 text-sm">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    
+                    <Button
+                      onClick={() => handleUpgrade(plan.tier)}
+                      disabled={isCurrent}
+                      className={`w-full h-12 rounded-xl font-semibold ${
+                        plan.popular 
+                          ? 'bg-violet-600 hover:bg-violet-700' 
+                          : 'bg-slate-900 hover:bg-slate-800'
+                      }`}
+                      variant={isCurrent ? 'outline' : 'default'}
+                    >
+                      {isCurrent ? 'Current Plan' : `Get ${plan.name}`}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Featured Listings Info */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <Card className="bg-gradient-to-br from-violet-600 to-purple-700 border-0 text-white">
+            <CardContent className="p-8 md:p-12">
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <Star className="w-8 h-8 text-white" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-2xl font-bold mb-2">Featured Listings</h3>
+                  <p className="text-violet-100 mb-4">
+                    Boost your listing to the top of search results and get 10x more views. Perfect for selling quickly.
+                  </p>
+                  <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start">
+                    <Badge className="bg-white/20 text-white border-white/30">
+                      $4.99 for 7 days
+                    </Badge>
+                    <Badge className="bg-white/20 text-white border-white/30">
+                      Included with Premium & Pro
+                    </Badge>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => !isAuthenticated ? base44.auth.redirectToLogin() : alert('Feature listing payment would go here')}
+                  className="bg-white text-violet-700 hover:bg-violet-50 h-12 px-8 rounded-xl font-semibold"
+                >
+                  Feature a Listing
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* FAQ */}
+        <div className="mt-16 text-center">
+          <h3 className="text-2xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h3>
+          <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto text-left">
+            <div>
+              <h4 className="font-semibold text-slate-900 mb-2">What are platform fees?</h4>
+              <p className="text-sm text-slate-600">
+                Platform fees are deducted from each sale to maintain the marketplace. Lower tiers get lower fees.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900 mb-2">Can I cancel anytime?</h4>
+              <p className="text-sm text-slate-600">
+                Yes! You can cancel your subscription at any time. You'll keep access until the end of your billing period.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900 mb-2">What happens when I upgrade?</h4>
+              <p className="text-sm text-slate-600">
+                Your new benefits take effect immediately, including lower fees on all future sales.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-slate-900 mb-2">Are featured listings worth it?</h4>
+              <p className="text-sm text-slate-600">
+                Featured listings get 10x more views on average and sell 3x faster. Great for high-value items.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

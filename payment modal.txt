@@ -1,0 +1,208 @@
+import React, { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { base44 } from '@/api/base44Client';
+import { Loader2, CreditCard, Smartphone, CheckCircle2, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export default function PaymentModal({ open, onClose, gadget, seller, buyer, onSuccess }) {
+  const [paymentMethod, setPaymentMethod] = useState('paypal');
+  const [ecocashNumber, setEcocashNumber] = useState('');
+  const [processing, setProcessing] = useState(false);
+  const [status, setStatus] = useState(null);
+  const [error, setError] = useState('');
+
+  const PLATFORM_FEE_PERCENTAGE = 0.05; // 5% platform fee
+  
+  const platformFee = gadget.price * PLATFORM_FEE_PERCENTAGE;
+  const sellerPayout = gadget.price - platformFee;
+
+  const handlePayment = async () => {
+    setProcessing(true);
+    setError('');
+    
+    if (paymentMethod === 'ecocash' && !ecocashNumber) {
+      setError('Please enter your EcoCash number');
+      setProcessing(false);
+      return;
+    }
+
+    // Create transaction record
+    const transaction = await base44.entities.Transaction.create({
+      gadget_id: gadget.id,
+      gadget_title: gadget.title,
+      buyer_email: buyer.email,
+      buyer_name: buyer.full_name,
+      seller_email: seller.email,
+      amount: gadget.price,
+      platform_fee: platformFee,
+      seller_payout: sellerPayout,
+      payment_method: paymentMethod,
+      payment_reference: `TXN-${Date.now()}`,
+      status: 'pending'
+    });
+
+    // Simulate payment processing
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    // Update transaction and gadget status
+    await base44.entities.Transaction.update(transaction.id, { status: 'completed' });
+    await base44.entities.Gadget.update(gadget.id, { status: 'sold' });
+    
+    setStatus('success');
+    setProcessing(false);
+    
+    setTimeout(() => {
+      onSuccess?.();
+      onClose();
+    }, 2000);
+  };
+
+  const resetAndClose = () => {
+    setStatus(null);
+    setError('');
+    setEcocashNumber('');
+    onClose();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={resetAndClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Complete Purchase</DialogTitle>
+        </DialogHeader>
+        
+        <AnimatePresence mode="wait">
+          {status === 'success' ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="py-8 text-center"
+            >
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Payment Successful!</h3>
+              <p className="text-slate-500">Your order has been confirmed. The seller will contact you shortly.</p>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="space-y-6"
+            >
+              <div className="bg-slate-50 rounded-xl p-4">
+                <div className="flex gap-4">
+                  <img 
+                    src={gadget.images?.[0] || '/placeholder.png'} 
+                    alt={gadget.title}
+                    className="w-20 h-20 rounded-lg object-cover"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-slate-900">{gadget.title}</h4>
+                    <p className="text-sm text-slate-500 mb-2">{gadget.category}</p>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Item price:</span>
+                        <span className="font-medium">${gadget.price?.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-slate-600">Platform fee (5%):</span>
+                        <span className="font-medium">${platformFee.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between pt-2 border-t">
+                        <span className="font-semibold text-slate-900">Total:</span>
+                        <span className="text-xl font-bold text-violet-600">${gadget.price?.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <Label className="text-sm font-medium mb-3 block">Select Payment Method</Label>
+                <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
+                  <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'paypal' ? 'border-violet-500 bg-violet-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                    <RadioGroupItem value="paypal" id="paypal" />
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <CreditCard className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900">PayPal</p>
+                        <p className="text-xs text-slate-500">Pay securely with PayPal</p>
+                      </div>
+                    </div>
+                  </label>
+                  
+                  <label className={`flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all ${paymentMethod === 'ecocash' ? 'border-violet-500 bg-violet-50' : 'border-slate-200 hover:border-slate-300'}`}>
+                    <RadioGroupItem value="ecocash" id="ecocash" />
+                    <div className="flex items-center gap-3 flex-1">
+                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <Smartphone className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-900">EcoCash</p>
+                        <p className="text-xs text-slate-500">Pay with mobile money</p>
+                      </div>
+                    </div>
+                  </label>
+                </RadioGroup>
+              </div>
+              
+              {paymentMethod === 'ecocash' && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                >
+                  <Label htmlFor="ecocash_number">EcoCash Phone Number</Label>
+                  <Input
+                    id="ecocash_number"
+                    placeholder="07XX XXX XXX"
+                    value={ecocashNumber}
+                    onChange={(e) => setEcocashNumber(e.target.value)}
+                    className="mt-2"
+                  />
+                </motion.div>
+              )}
+              
+              {error && (
+                <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 p-3 rounded-lg">
+                  <AlertCircle className="w-4 h-4" />
+                  {error}
+                </div>
+              )}
+              
+              <div className="flex gap-3">
+                <Button variant="outline" onClick={resetAndClose} className="flex-1">
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handlePayment} 
+                  disabled={processing}
+                  className="flex-1 bg-violet-600 hover:bg-violet-700"
+                >
+                  {processing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    `Pay $${gadget.price?.toLocaleString()}`
+                  )}
+                </Button>
+              </div>
+              
+              <p className="text-xs text-slate-400 text-center">
+                By completing this purchase, you agree to our terms and conditions.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </DialogContent>
+    </Dialog>
+  );
+}
