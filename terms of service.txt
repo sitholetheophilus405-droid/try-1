@@ -1,0 +1,110 @@
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { ArrowLeft } from 'lucide-react';
+
+export default function TermsOfService() {
+  return (
+    <div className="min-h-screen bg-slate-50 py-12">
+      <div className="max-w-4xl mx-auto px-4">
+        <Link to={createPageUrl('Home')} className="inline-flex items-center text-sm text-slate-500 hover:text-violet-600 mb-6">
+          <ArrowLeft className="w-4 h-4 mr-1" />
+          Back to home
+        </Link>
+
+        <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Terms of Service</h1>
+          <p className="text-slate-500 mb-8">Last updated: December 23, 2025</p>
+
+          <div className="prose prose-slate max-w-none">
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">1. Acceptance of Terms</h2>
+            <p className="text-slate-600 mb-4">
+              By accessing and using GadgetX, you accept and agree to be bound by these Terms of Service. 
+              If you do not agree to these terms, please do not use our platform.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">2. User Accounts</h2>
+            <p className="text-slate-600 mb-4">
+              You must create an account to sell items on GadgetX. You are responsible for maintaining 
+              the confidentiality of your account credentials and for all activities under your account.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">3. Listing Requirements</h2>
+            <p className="text-slate-600 mb-4">
+              Sellers must provide accurate descriptions and images of items. You may only list items 
+              you own and have the right to sell. Prohibited items include stolen goods, counterfeit 
+              products, and illegal items.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">4. Fees and Payments</h2>
+            <p className="text-slate-600 mb-4">
+              GadgetX charges platform fees on completed sales as follows:
+            </p>
+            <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
+              <li>Free tier: 5% of sale price</li>
+              <li>Premium tier: 3% of sale price ($9.99/month)</li>
+              <li>Pro tier: 2% of sale price ($29.99/month)</li>
+            </ul>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">5. Buyer-Seller Transactions</h2>
+            <p className="text-slate-600 mb-4">
+              GadgetX facilitates connections between buyers and sellers but is not a party to transactions. 
+              Disputes should be resolved directly between buyers and sellers. We recommend meeting in safe, 
+              public locations for exchanges.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">6. Payment Processing</h2>
+            <p className="text-slate-600 mb-4">
+              We support PayPal and EcoCash payment methods. Payments are processed securely through 
+              our platform. Platform fees are automatically deducted from seller payouts.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">7. Prohibited Conduct</h2>
+            <p className="text-slate-600 mb-4">
+              You may not:
+            </p>
+            <ul className="list-disc pl-6 text-slate-600 mb-4 space-y-2">
+              <li>Post false, misleading, or fraudulent listings</li>
+              <li>Engage in price manipulation or bid shilling</li>
+              <li>Harass or abuse other users</li>
+              <li>Circumvent platform fees</li>
+              <li>Use automated tools to scrape data</li>
+            </ul>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">8. Intellectual Property</h2>
+            <p className="text-slate-600 mb-4">
+              GadgetX and its logos are trademarks owned by Theophilus T Sithole. You may not use our 
+              branding without permission. You retain rights to content you post but grant us license 
+              to display it on our platform.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">9. Termination</h2>
+            <p className="text-slate-600 mb-4">
+              We reserve the right to suspend or terminate accounts that violate these terms. You may 
+              close your account at any time through account settings.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">10. Limitation of Liability</h2>
+            <p className="text-slate-600 mb-4">
+              GadgetX is not liable for disputes between buyers and sellers, quality of items, or 
+              transaction outcomes. Use our platform at your own risk.
+            </p>
+
+            <h2 className="text-xl font-semibold text-slate-900 mt-8 mb-4">11. Contact</h2>
+            <p className="text-slate-600 mb-4">
+              For questions about these Terms of Service, contact us at legal@gadgetx.com
+            </p>
+
+            <div className="bg-slate-50 rounded-xl p-6 mt-8">
+              <p className="text-sm text-slate-600">
+                <strong>GadgetX</strong> is owned and operated by <strong>Theophilus T Sithole</strong>, 
+                co-founded with <strong>Amos B Nyamaropa</strong>. 
+                © {new Date().getFullYear()} GadgetX. All rights reserved.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

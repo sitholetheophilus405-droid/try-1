@@ -1,0 +1,201 @@
+import React, { useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
+import { base44 } from '@/api/base44Client';
+import { useQuery } from '@tanstack/react-query';
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import GadgetCard from '@/components/gadgets/GadgetCard';
+import GadgetFilters from '@/components/gadgets/GadgetFilters';
+import { Plus, Smartphone, Laptop, Headphones, Watch, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const categoryIcons = {
+  phones: Smartphone,
+  laptops: Laptop,
+  audio: Headphones,
+  wearables: Watch
+};
+
+export default function Home() {
+  const [filters, setFilters] = useState({
+    search: '',
+    category: 'all',
+    condition: 'all',
+    sort: 'newest'
+  });
+  const [showFilters, setShowFilters] = useState(false);
+
+  const { data: gadgets = [], isLoading } = useQuery({
+    queryKey: ['gadgets'],
+    queryFn: () => base44.entities.Gadget.list('-created_date', 100),
+  });
+
+  const filteredGadgets = useMemo(() => {
+    let result = [...gadgets].filter(g => g.status !== 'sold');
+    
+    // Sort featured listings first
+    result.sort((a, b) => {
+      if (a.is_featured && !b.is_featured) return -1;
+      if (!a.is_featured && b.is_featured) return 1;
+      return 0;
+    });
+    
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      result = result.filter(g => 
+        g.title?.toLowerCase().includes(searchLower) ||
+        g.description?.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    if (filters.category !== 'all') {
+      result = result.filter(g => g.category === filters.category);
+    }
+    
+    if (filters.condition !== 'all') {
+      result = result.filter(g => g.condition === filters.condition);
+    }
+    
+    switch (filters.sort) {
+      case 'price_low':
+        result.sort((a, b) => (a.price || 0) - (b.price || 0));
+        break;
+      case 'price_high':
+        result.sort((a, b) => (b.price || 0) - (a.price || 0));
+        break;
+      case 'oldest':
+        result.sort((a, b) => new Date(a.created_date) - new Date(b.created_date));
+        break;
+      default:
+        result.sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    }
+    
+    return result;
+  }, [gadgets, filters]);
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-violet-600 via-violet-700 to-purple-800 overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djJoLTJ2LTJoMnptMC00aDJ2MmgtMnYtMnptLTQgMHYyaC0ydi0yaDJ6bTItMmgydjJoLTJ2LTJ6bS0yLTJoMnYyaC0ydi0yem0tMiAydjJoLTJ2LTJoMnptLTIgMmgydjJoLTJ2LTJ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
+        
+        <div className="max-w-7xl mx-auto px-4 py-16 sm:py-24 relative">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center max-w-3xl mx-auto"
+          >
+            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white/90 px-4 py-2 rounded-full text-sm mb-6">
+              <Sparkles className="w-4 h-4" />
+              <span>Your trusted marketplace for gadgets</span>
+            </div>
+            
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight">
+              Buy & Sell Gadgets
+              <span className="block text-violet-200">With Confidence</span>
+            </h1>
+            
+            <p className="text-lg text-violet-100 mb-8 max-w-xl mx-auto">
+              Join thousands of users buying and selling quality electronics. From smartphones to laptops, find your next tech treasure.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to={createPageUrl('CreateListing')}>
+                <Button size="lg" className="w-full sm:w-auto bg-white text-violet-700 hover:bg-violet-50 h-14 px-8 rounded-xl font-semibold shadow-lg shadow-violet-900/20">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Sell Your Gadget
+                </Button>
+              </Link>
+              <Button 
+                size="lg" 
+                variant="outline" 
+                className="w-full sm:w-auto border-white/30 text-white hover:bg-white/10 h-14 px-8 rounded-xl"
+                onClick={() => document.getElementById('browse')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Browse Listings
+              </Button>
+            </div>
+          </motion.div>
+          
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="grid grid-cols-3 gap-4 sm:gap-8 max-w-2xl mx-auto mt-16"
+          >
+            {[
+              { value: `${gadgets.length}+`, label: 'Active Listings' },
+              { value: '100%', label: 'Secure Payments' },
+              { value: '24/7', label: 'Support' }
+            ].map((stat, i) => (
+              <div key={i} className="text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</p>
+                <p className="text-sm text-violet-200">{stat.label}</p>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+        
+        {/* Wave */}
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg viewBox="0 0 1440 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z" fill="#f8fafc"/>
+          </svg>
+        </div>
+      </section>
+
+      {/* Browse Section */}
+      <section id="browse" className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Browse Gadgets</h2>
+            <p className="text-slate-500 mt-1">
+              {filteredGadgets.length} {filteredGadgets.length === 1 ? 'listing' : 'listings'} available
+            </p>
+          </div>
+        </div>
+
+        <GadgetFilters 
+          filters={filters} 
+          setFilters={setFilters}
+          showFilters={showFilters}
+          setShowFilters={setShowFilters}
+        />
+
+        {isLoading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-8">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="space-y-3">
+                <Skeleton className="aspect-square rounded-2xl" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-6 w-1/2" />
+              </div>
+            ))}
+          </div>
+        ) : filteredGadgets.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Smartphone className="w-10 h-10 text-slate-300" />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-2">No gadgets found</h3>
+            <p className="text-slate-500 mb-6">Try adjusting your filters or search terms</p>
+            <Link to={createPageUrl('CreateListing')}>
+              <Button className="bg-violet-600 hover:bg-violet-700">
+                <Plus className="w-4 h-4 mr-2" />
+                List Your First Gadget
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 mt-8">
+            {filteredGadgets.map((gadget, index) => (
+              <GadgetCard key={gadget.id} gadget={gadget} index={index} />
+            ))}
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}

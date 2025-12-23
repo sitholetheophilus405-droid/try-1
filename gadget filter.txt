@@ -1,0 +1,160 @@
+import React from 'react';
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+
+const categories = [
+  { value: 'all', label: 'All Categories' },
+  { value: 'phones', label: 'Phones' },
+  { value: 'laptops', label: 'Laptops' },
+  { value: 'tablets', label: 'Tablets' },
+  { value: 'accessories', label: 'Accessories' },
+  { value: 'cameras', label: 'Cameras' },
+  { value: 'gaming', label: 'Gaming' },
+  { value: 'audio', label: 'Audio' },
+  { value: 'wearables', label: 'Wearables' },
+  { value: 'other', label: 'Other' }
+];
+
+const conditions = [
+  { value: 'all', label: 'Any Condition' },
+  { value: 'new', label: 'New' },
+  { value: 'like_new', label: 'Like New' },
+  { value: 'good', label: 'Good' },
+  { value: 'fair', label: 'Fair' },
+  { value: 'poor', label: 'Poor' }
+];
+
+const sortOptions = [
+  { value: 'newest', label: 'Newest First' },
+  { value: 'oldest', label: 'Oldest First' },
+  { value: 'price_low', label: 'Price: Low to High' },
+  { value: 'price_high', label: 'Price: High to Low' }
+];
+
+export default function GadgetFilters({ filters, setFilters, showFilters, setShowFilters }) {
+  const hasActiveFilters = filters.category !== 'all' || filters.condition !== 'all' || filters.search;
+  
+  const clearFilters = () => {
+    setFilters({
+      search: '',
+      category: 'all',
+      condition: 'all',
+      sort: 'newest'
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Input
+            placeholder="Search gadgets..."
+            value={filters.search}
+            onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+            className="pl-11 h-12 bg-white border-slate-200 rounded-xl focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+          />
+        </div>
+        
+        <Button
+          variant="outline"
+          onClick={() => setShowFilters(!showFilters)}
+          className={`h-12 px-5 rounded-xl border-slate-200 ${showFilters ? 'bg-violet-50 border-violet-300 text-violet-600' : ''}`}
+        >
+          <SlidersHorizontal className="w-4 h-4 mr-2" />
+          Filters
+          {hasActiveFilters && (
+            <span className="ml-2 w-2 h-2 rounded-full bg-violet-500" />
+          )}
+        </Button>
+      </div>
+      
+      <AnimatePresence>
+        {showFilters && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2 block">
+                    Category
+                  </label>
+                  <Select
+                    value={filters.category}
+                    onValueChange={(value) => setFilters({ ...filters, category: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(cat => (
+                        <SelectItem key={cat.value} value={cat.value}>{cat.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2 block">
+                    Condition
+                  </label>
+                  <Select
+                    value={filters.condition}
+                    onValueChange={(value) => setFilters({ ...filters, condition: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {conditions.map(cond => (
+                        <SelectItem key={cond.value} value={cond.value}>{cond.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-2 block">
+                    Sort By
+                  </label>
+                  <Select
+                    value={filters.sort}
+                    onValueChange={(value) => setFilters({ ...filters, sort: value })}
+                  >
+                    <SelectTrigger className="h-11 rounded-xl">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sortOptions.map(opt => (
+                        <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              {hasActiveFilters && (
+                <Button
+                  variant="ghost"
+                  onClick={clearFilters}
+                  className="mt-4 text-slate-500 hover:text-slate-700"
+                >
+                  <X className="w-4 h-4 mr-1" />
+                  Clear all filters
+                </Button>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
